@@ -6,9 +6,9 @@
 <body>
   <style>
     .container {
-      max-height: 200px;
-      min-height: 100px;
-      width: 150px;
+      max-height: 300px;
+      min-height: 150px;
+      width: 200px;
       border: 2px solid rgba(0,0,0,0.3);
       border-radius: 4px;
       background: white;
@@ -21,6 +21,9 @@
 
   <div class="container">
     <h4>Retrieve Table</h4>
+
+    <select id="tableSelector" class="form-control mb-2" style="display: none;"></select>
+
     <button class="btn btn-success mt-2" id="downloadCsvBtn">Download CSV</button>
   </div>
 

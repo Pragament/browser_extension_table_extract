@@ -4,9 +4,14 @@
   <meta charset="UTF-8">
   <title>Extract & Visualize Table</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  
+
+  <!-- ✅ CSS Libraries -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.datatables.net/v/dt/dt-2.3.0/b-2.4.1/b-html5-2.4.1/b-print-2.4.1/cr-1.7.0/fh-4.0.0/r-3.0.0/datatables.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="scripts/datatables.min.css">
+  <link rel="stylesheet" href="scripts/buttons.dataTables.min.css">
+  <link rel="stylesheet" href="styles/datatables.min.css">
+  <link rel="stylesheet" href="styles/datatables.css">
 
   <style>
     body {
@@ -14,17 +19,16 @@
       padding: 10px;
       font-family: Arial, sans-serif;
     }
-
-    select, button {
+    select, button, textarea {
       margin-top: 10px;
       width: 100%;
     }
-
     canvas {
       margin-top: 15px;
     }
   </style>
 </head>
+
 <body>
   <h5>✅ Extract & Visualize Table</h5>
 
@@ -33,6 +37,13 @@
 
   <div id="tableContainer" class="mt-3"></div>
 
+  <!-- ✅ SQL Section -->
+  <h6 class="mt-3">🧠 SQL Query</h6>
+  <textarea id="sqlQuery" placeholder="SELECT * FROM data;" style="height: 90px; font-family: monospace;"></textarea>
+  <button id="runSqlBtn" class="btn btn-primary mt-1">▶️ Run SQL</button>
+  <div id="sqlResult" class="mt-2"></div>
+
+  <!-- ✅ Chart Controls -->
   <h6 class="mt-3">📊 Chart Controls</h6>
   <select id="chartType" class="form-select">
     <option value="bar">Bar</option>
@@ -46,23 +57,16 @@
   <button id="downloadChart" class="btn btn-primary mt-2">⬇️ Download Chart</button>
   <canvas id="chartCanvas" width="320" height="200"></canvas>
 
+  <!-- ✅ JS Libraries (placed at end) -->
   <script src="/scripts/jquery.min.js"></script>
-  <script src="/scripts/extension.js"></script>
   <script src="scripts/chart.umd.js"></script>
   <script src="scripts/datatables.min.js"></script>
-
-  <link rel="stylesheet" href="scripts/datatables.min.css">
-  <script src="scripts/datatables.min.js"></script>
-
-  <link rel="stylesheet" href="scripts/buttons.dataTables.min.css">
   <script src="scripts/dataTables.buttons.min.js"></script>
   <script src="scripts/jszip.min.js"></script>
   <script src="scripts/pdfmake.min.js"></script>
   <script src="scripts/vfs_fonts.js"></script>
   <script src="scripts/buttons.html5.min.js"></script>
   <script src="scripts/buttons.print.min.js"></script>
-  
-  <link rel="stylesheet" href="styles/datatables.min.css" />
-  <link rel="stylesheet" href="styles/datatables.css" />
+  <script src="scripts/extension.js"></script>
 </body>
 </html>

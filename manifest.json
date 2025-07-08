@@ -1,29 +1,41 @@
 {
   "manifest_version": 3,
-  "name": "Retrieve table",
+  "name": "Retrieve Table Enhancer",
   "version": "1.0",
-  "description": "Add the reading time to Chrome Extension documentation articles",
+  "description": "Enhance tables with charts and SQL queries.",
 
   "action": {
-    "default_icon": "favicon.png",
     "default_popup": "popup.html",
-    "default_title": "ChromiePop"
-  },
-  "icons": {
-    "16": "images/icon-16.png",
-    "32": "images/icon-32.png",
-    "48": "images/icon-48.png",
-    "128": "images/icon-128.png"
+    "default_icon": "favicon.png"
   },
 
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "all_frames": true,
       "js": ["scripts/content.js"]
     }
   ],
 
-  "permissions": ["activeTab", "scripting"],
-  "host_permissions": ["<all_urls>"]
+  "permissions": ["scripting", "activeTab"],
+
+  "host_permissions": ["<all_urls>"],
+
+ "web_accessible_resources": [
+  {
+    "resources": [
+      "scripts/sql-wasm.js",
+      "scripts/sql-wasm.wasm",
+      "scripts/sql-worker.js"
+    ],
+    "matches": ["<all_urls>"]
+  }
+],
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+ "content_security_policy": {
+  "extension_pages": "script-src 'self'; object-src 'self';"
+ }
 }

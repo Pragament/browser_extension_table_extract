@@ -1,88 +1,56 @@
-// (() => {
-//   let dataTables = [];
-//   console.log("Script is working");
-//   const findDataTables = (dataTables) => {
-//     const tables = document.getElementsByTagName("table");
-//     for (let table of tables) {
-//       const t = table.querySelectorAll("td > table");
-//       console.log(t);
-//       if (t.length > 0) {
-//         dataTables.push(...t);
-//         console.log(dataTables);
-//       }
-//     }
-//   };
+function injectEnhancePrompt() {
+  if (document.getElementById("enhancePrompt")) return;
 
-//   const extractDataCollection = (dataTable) => {
-//     const rows = dataTable.querySelectorAll("tr");
-//     let keys = [];
-//     Array.from(rows[0].querySelectorAll("td"), (el) => {
-//       keys.push(el.innerHTML);
-//     });
-//     const dataList = [];
+  const prompt = document.createElement("div");
+  prompt.id = "enhancePrompt";
+  prompt.style = `
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999999;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 12px 16px;
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 15px;
+  display: flex;
+  flex-direction: column; /* 👈 important for vertical layout */
+  width: 220px;           /* 👈 decrease width */
+  height: auto;           /* 👈 allow height to grow */
+  gap: 10px;
+  border: 1px solid #ccc;
+`;
 
-//     for (let i = 1; i < rows.length; i++) {
-//       let obj = {};
-//       Array.from(rows[i].querySelectorAll("td"), (el, idx) => {
-//         obj[keys[idx]] = el.innerText;
-//       });
-//       // console.log(obj);
-//       dataList.push(obj);
-//     }
-//     return dataList;
-//   };
+ prompt.innerHTML = `
+  <span style="font-weight: 350; margin-bottom: 6px;">📊 Table detected! Enhance it?</span>
+  <div style="display: flex; gap: 10px;">
+    <button id="enhanceBtn" style="background-color: #28a745; color: white; border: none; padding: 5px 5px; border-radius: 3px; cursor: pointer;">✅ Enhance</button>
+    <button id="ignoreBtn" style="background-color: #dc3545; color: white; border: none; padding: 5px 5px; border-radius: 3px; cursor: pointer;">❌ Ignore</button>
+  </div>
+`;
 
-//   findDataTables(dataTables);
-//   console.log(dataTables);
-//   const collectionList = [];
 
-//   for (let i of dataTables) {
-//     collectionList.push(extractDataCollection(i));
-//   }
-//   console.log(collectionList);
-// })();
+  document.body.appendChild(prompt);
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  let dataTables = [];
-  console.log("Script is working");
-  const findDataTables = (dataTables) => {
-    const tables = document.getElementsByTagName("table");
-    for (let table of tables) {
-      const t = table.querySelectorAll("td > table");
-      console.log(t);
-      if (t.length > 0) {
-        dataTables.push(...t);
-        console.log(dataTables);
-      }
-    }
+  document.getElementById("enhanceBtn").onclick = () => {
+    prompt.remove();
+    injectEnhancerUI();
   };
 
-  const extractDataCollection = (dataTable) => {
-    const rows = dataTable.querySelectorAll("tr");
-    let keys = [];
-    Array.from(rows[0].querySelectorAll("td"), (el) => {
-      keys.push(el.innerHTML);
-    });
-    const dataList = [];
+  document.getElementById("ignoreBtn").onclick = () => prompt.remove();
+}
 
-    for (let i = 1; i < rows.length; i++) {
-      let obj = {};
-      Array.from(rows[i].querySelectorAll("td"), (el, idx) => {
-        obj[keys[idx]] = el.innerText;
-      });
-      // console.log(obj);
-      dataList.push(obj);
-    }
-    return dataList;
-  };
+function injectEnhancerUI() {
+  const script = document.createElement("script");
+  script.src = chrome.runtime.getURL("scripts/table_enhancer.js");
+  script.type = "module";
+  document.body.appendChild(script);
+}
 
-  findDataTables(dataTables);
-  console.log(dataTables);
-  const collectionList = [];
-
-  for (let i of dataTables) {
-    collectionList.push(extractDataCollection(i));
+(function () {
+  const tables = document.querySelectorAll("table");
+  if (tables.length > 0) {
+    injectEnhancePrompt();
   }
-  console.log(collectionList);
-  sendResponse({ data: collectionList, success: true });
-});
+})();

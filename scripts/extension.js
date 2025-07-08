@@ -1,5 +1,6 @@
 let tableDataArray = [];
 let dataTable;
+let sqlWorker;
 let chart;
 
 function extractAllTables() {
@@ -30,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("chartType").addEventListener("change", renderChart);
   document.getElementById("xAxis").addEventListener("change", renderChart);
   document.getElementById("yAxis").addEventListener("change", renderChart);
-  document.getElementById("downloadChart").addEventListener("click", downloadChartImage);
+  document.getElementById("runSqlBtn").addEventListener("click", runSQLQuery);
 });
 
 function populateTableSelector() {
@@ -72,6 +73,77 @@ function renderTableAndChartControls() {
   const ySel = document.getElementById("yAxis");
   xSel.innerHTML = headers.map((h, i) => `<option value="${i}">${h}</option>`).join("");
   ySel.innerHTML = headers.map((h, i) => `<option value="${i}">${h}</option>`).join("");
+
+  initializeSQLDatabase(headers, body);
+}
+
+function initializeSQLDatabase(headers, rows) {
+  if (sqlWorker) sqlWorker.terminate();
+
+  sqlWorker = new Worker(chrome.runtime.getURL("scripts/sql-worker.js"));
+
+  const sqlJsUrl = chrome.runtime.getURL("scripts/sql-wasm.js");
+
+  sqlWorker.onmessage = (e) => {
+    const { type, result, error } = e.data;
+
+    if (type === "ready") {
+      sqlWorker.postMessage({ type: "init", headers, rows });
+    } else if (type === "initialized") {
+      showSQLResult("✅ SQL database initialized.");
+    } else if (type === "queryResult") {
+      renderSQLResult(result);
+    } else if (type === "error") {
+      showSQLResult(`❌ SQL Error: ${error}`);
+    }
+  };
+
+  sqlWorker.postMessage({ type: "initWorker", wasmPath: sqlJsUrl });
+}
+
+function runSQLQuery() {
+  const inputEl = document.getElementById("sqlQuery");
+  if (!inputEl) {
+    showSQLResult("❌ SQL input box not found.");
+    return;
+  }
+
+  const query = inputEl.value.trim();
+  if (!query) {
+    showSQLResult("⚠️ Please enter a SQL query.");
+    return;
+  }
+
+  if (!sqlWorker) {
+    showSQLResult("⚠️ SQL worker not ready.");
+    return;
+  }
+
+  sqlWorker.postMessage({ type: "query", query });
+}
+
+function showSQLResult(message) {
+  const output = document.getElementById("sqlResult");
+  output.innerHTML = `<div class="text-warning mt-2">${message}</div>`;
+}
+
+function renderSQLResult(result) {
+  const output = document.getElementById("sqlResult");
+  if (!result || result.length === 0) {
+    output.innerHTML = "<div class='text-muted'>No results.</div>";
+    return;
+  }
+
+  const headers = result[0].columns;
+  const rows = result[0].values;
+
+  let html = "<table class='table table-sm table-bordered'><thead><tr>";
+  html += headers.map(h => `<th>${h}</th>`).join("");
+  html += "</tr></thead><tbody>";
+  html += rows.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join("")}</tr>`).join("");
+  html += "</tbody></table>";
+
+  output.innerHTML = html;
 }
 
 function downloadCSV() {
